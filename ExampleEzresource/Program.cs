@@ -3,26 +3,22 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using GenEzResource.UI.Extensions;
 using ExampleEzresource.Models;
 using Radzen;
+using ExampleEzresource;
 
-namespace ExampleEzresource;
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
+builder.RootComponents.Add<App>("#app");
+builder.RootComponents.Add<HeadOutlet>("head::after");
 
-public class Program
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+
+builder.Services.AddGenEzResourceUI(registry =>
 {
-    public static async Task Main(string[] args)
-    {
-        var builder = WebAssemblyHostBuilder.CreateDefault(args);
-        builder.RootComponents.Add<App>("#app");
-        builder.RootComponents.Add<HeadOutlet>("head::after");
-        builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-        builder.Services.AddGenEzResourceUI(registry =>
-        {
-            registry.AddResource<Customer>();
-            registry.AddResource<Project>();
-            registry.AddResource<TaskItem>();
-        });
-        builder.Services.AddRadzenComponents();
-        builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
+    registry.AddResource<Customer>();
+    registry.AddResource<Project>();
+    registry.AddResource<TaskItem>();
+});
 
-        await builder.Build().RunAsync();
-    }
-}
+builder.Services.AddRadzenComponents();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(App).Assembly));
+
+await builder.Build().RunAsync();
