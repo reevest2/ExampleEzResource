@@ -1,0 +1,10 @@
+﻿@page "/resources/{ResourceName}"
+
+<PageTitle>@ResourceName</PageTitle>
+
+<GenEzResourceView ResourceName="@ResourceName" />
+
+@code {
+    [Parameter]
+    public string ResourceName { get; set; } = string.Empty;
+}
